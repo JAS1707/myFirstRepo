@@ -309,7 +309,7 @@ public class GameForm : Form
             Size = new Size(200, 28),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
-        comboBoxDifficulty.Items.AddRange(new object[] { Difficulty.Easy, Difficulty.Medium, Difficulty.Hard });
+        comboBoxDifficulty.Items.AddRange(new object[] { Difficulty.Easy, Difficulty.Medium, Difficulty.Hard, Difficulty.Endless });
         comboBoxDifficulty.SelectedIndex = 1;
 
         buttonStart = new Button
@@ -453,6 +453,7 @@ public class GameForm : Form
             Difficulty.Hard => 2,
             Difficulty.Medium => 3,
             Difficulty.Easy => 4,
+            Difficulty.Endless => 1,
             _ => 3
         };
         clueIndex = 0;
@@ -503,7 +504,14 @@ public class GameForm : Form
             labelFeedback.ForeColor = Color.Green;
             labelFeedback.Text = $"Correct! {currentDriver.Name} is the driver.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality} | {currentDriver.ExtraInfo}\nYou earned {points} points.";
             UpdateScoreDisplay();
-            EndRound();
+            if (difficulty == Difficulty.Endless)
+            {
+                StartNewRound();
+            }
+            else
+            {
+                EndRound();
+            }
             return;
         }
 
@@ -519,10 +527,22 @@ public class GameForm : Form
         else
         {
             labelFeedback.ForeColor = Color.DarkRed;
-            labelFeedback.Text = $"Out of guesses. The correct answer was {currentDriver.Name}.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality}";
-            attemptsLeft = 0;
-            UpdateAttemptDisplay();
-            EndRound();
+            if (difficulty == Difficulty.Endless)
+            {
+                labelFeedback.Text = $"Wrong guess. Game Over!\nThe correct answer was {currentDriver.Name}.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality}\nFinal Score: {score}";
+                buttonGuess.Enabled = false;
+                textBoxGuess.Enabled = false;
+                buttonNewRound.Visible = true;
+                buttonNewRound.Text = "Play Again";
+                buttonNewRound.Enabled = true;
+            }
+            else
+            {
+                labelFeedback.Text = $"Out of guesses. The correct answer was {currentDriver.Name}.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality}";
+                attemptsLeft = 0;
+                UpdateAttemptDisplay();
+                EndRound();
+            }
         }
     }
 
@@ -536,6 +556,12 @@ public class GameForm : Form
 
     private void ButtonNewRound_Click(object? sender, EventArgs e)
     {
+        if (difficulty == Difficulty.Endless && buttonNewRound.Text == "Play Again")
+        {
+            score = 0;
+            UpdateScoreDisplay();
+            buttonNewRound.Text = "Next Round";
+        }
         StartNewRound();
     }
 
@@ -570,7 +596,14 @@ public class GameForm : Form
 
     private void UpdateAttemptDisplay()
     {
-        labelAttempts.Text = $"Attempts left: {attemptsLeft}";
+        if (difficulty == Difficulty.Endless)
+        {
+            labelAttempts.Text = "Endless: one wrong guess ends the game";
+        }
+        else
+        {
+            labelAttempts.Text = $"Attempts left: {attemptsLeft}";
+        }
     }
 
     private void UpdateScoreDisplay()
@@ -585,5 +618,6 @@ public enum Difficulty
 {
     Easy,
     Medium,
-    Hard
+    Hard,
+    Endless
 }
