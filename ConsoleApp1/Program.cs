@@ -551,6 +551,10 @@ public class GameForm : Form
     {
         paused = !paused;
         pausePanel.Visible = paused;
+        if (paused)
+        {
+            pausePanel.BringToFront();
+        }
         textBoxGuess.Enabled = !paused && currentDriver is not null && attemptsLeft > 0;
         buttonGuess.Enabled = !paused && currentDriver is not null && attemptsLeft > 0;
         buttonNewRound.Enabled = !paused && buttonNewRound.Visible;
