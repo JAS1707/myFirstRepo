@@ -44,10 +44,10 @@ public class GameForm : Form
             new[]
             {
                 "Seven-time world champion.",
-                "Races for Ferrari in the 2026 season.",
+                "Races for Mercedes.",
                 "Holds numerous F1 records including pole positions."
             },
-            "Ferrari",
+            "Mercedes",
             "United Kingdom",
             "Drives with number 44."),
         new Driver(
@@ -309,7 +309,7 @@ public class GameForm : Form
             Size = new Size(200, 28),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
-        comboBoxDifficulty.Items.AddRange(new object[] { Difficulty.Easy, Difficulty.Medium, Difficulty.Hard, Difficulty.Endless });
+        comboBoxDifficulty.Items.AddRange(new object[] { Difficulty.Easy, Difficulty.Medium, Difficulty.Hard });
         comboBoxDifficulty.SelectedIndex = 1;
 
         buttonStart = new Button
@@ -453,7 +453,6 @@ public class GameForm : Form
             Difficulty.Hard => 2,
             Difficulty.Medium => 3,
             Difficulty.Easy => 4,
-            Difficulty.Endless => 1,
             _ => 3
         };
         clueIndex = 0;
@@ -504,14 +503,7 @@ public class GameForm : Form
             labelFeedback.ForeColor = Color.Green;
             labelFeedback.Text = $"Correct! {currentDriver.Name} is the driver.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality} | {currentDriver.ExtraInfo}\nYou earned {points} points.";
             UpdateScoreDisplay();
-            if (difficulty == Difficulty.Endless)
-            {
-                StartNewRound();
-            }
-            else
-            {
-                EndRound();
-            }
+            EndRound();
             return;
         }
 
@@ -527,22 +519,10 @@ public class GameForm : Form
         else
         {
             labelFeedback.ForeColor = Color.DarkRed;
-            if (difficulty == Difficulty.Endless)
-            {
-                labelFeedback.Text = $"Wrong guess. Game Over!\nThe correct answer was {currentDriver.Name}.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality}\nFinal Score: {score}";
-                buttonGuess.Enabled = false;
-                textBoxGuess.Enabled = false;
-                buttonNewRound.Visible = true;
-                buttonNewRound.Text = "Play Again";
-                buttonNewRound.Enabled = true;
-            }
-            else
-            {
-                labelFeedback.Text = $"Out of guesses. The correct answer was {currentDriver.Name}.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality}";
-                attemptsLeft = 0;
-                UpdateAttemptDisplay();
-                EndRound();
-            }
+            labelFeedback.Text = $"Out of guesses. The correct answer was {currentDriver.Name}.\nTeam: {currentDriver.Team} | Nationality: {currentDriver.Nationality}";
+            attemptsLeft = 0;
+            UpdateAttemptDisplay();
+            EndRound();
         }
     }
 
@@ -556,12 +536,6 @@ public class GameForm : Form
 
     private void ButtonNewRound_Click(object? sender, EventArgs e)
     {
-        if (difficulty == Difficulty.Endless && buttonNewRound.Text == "Play Again")
-        {
-            score = 0;
-            UpdateScoreDisplay();
-            buttonNewRound.Text = "Next Round";
-        }
         StartNewRound();
     }
 
@@ -596,14 +570,7 @@ public class GameForm : Form
 
     private void UpdateAttemptDisplay()
     {
-        if (difficulty == Difficulty.Endless)
-        {
-            labelAttempts.Text = "Endless: one wrong guess ends the game";
-        }
-        else
-        {
-            labelAttempts.Text = $"Attempts left: {attemptsLeft}";
-        }
+        labelAttempts.Text = $"Attempts left: {attemptsLeft}";
     }
 
     private void UpdateScoreDisplay()
@@ -618,6 +585,5 @@ public enum Difficulty
 {
     Easy,
     Medium,
-    Hard,
-    Endless
+    Hard
 }
